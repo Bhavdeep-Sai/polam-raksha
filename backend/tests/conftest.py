@@ -1,0 +1,15 @@
+from collections.abc import Generator
+
+import pytest
+from fastapi.testclient import TestClient
+
+from app.main import app
+
+
+@pytest.fixture
+def client() -> Generator[TestClient, None, None]:
+    """Provide a FastAPI TestClient with cleaned dependency overrides."""
+    with TestClient(app) as test_client:
+        yield test_client
+    app.dependency_overrides.clear()
+

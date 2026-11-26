@@ -1,0 +1,5659 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "PolamRaksha API",
+    "description": "PolamRaksha (\u0c2a\u0c4a\u0c32\u0c02\u0c30\u0c15\u0c4d\u0c37) agricultural surplus recovery platform API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/v1/health": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "summary": "Service liveness check",
+        "description": "Return basic liveness status without external dependencies.",
+        "operationId": "health_check_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ready": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "summary": "Service readiness check",
+        "description": "Verify PostgreSQL connectivity for readiness probes.",
+        "operationId": "readiness_check_api_v1_ready_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadinessResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Register a new farmer or buyer account",
+        "operationId": "register_api_v1_auth_register_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Authenticate with email/phone and password",
+        "operationId": "login_api_v1_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/pin-login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Authenticate keypad phone user with phone number and PIN",
+        "operationId": "pin_login_api_v1_auth_pin_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PinLoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Rotate refresh token and issue a new access token",
+        "operationId": "refresh_api_v1_auth_refresh_post",
+        "parameters": [
+          {
+            "name": "x-csrf-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Csrf-Token"
+            }
+          },
+          {
+            "name": "polam_refresh_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Polam Refresh Token"
+            }
+          },
+          {
+            "name": "polam_csrf_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Polam Csrf Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/RefreshRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Payload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Revoke refresh token and clear auth cookies",
+        "operationId": "logout_api_v1_auth_logout_post",
+        "parameters": [
+          {
+            "name": "x-csrf-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Csrf-Token"
+            }
+          },
+          {
+            "name": "polam_refresh_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Polam Refresh Token"
+            }
+          },
+          {
+            "name": "polam_csrf_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Polam Csrf Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/RefreshRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Payload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogoutResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Get the currently authenticated user",
+        "operationId": "me_api_v1_auth_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSummary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/farmers/assisted": {
+      "get": {
+        "tags": [
+          "farmers"
+        ],
+        "summary": "List farmers assigned to the current operator and assisted audit history",
+        "operationId": "list_assisted_farmers_api_v1_farmers_assisted_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorAssistedOverviewResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "farmers"
+        ],
+        "summary": "Register a farmer via an authorized operator with recorded consent",
+        "operationId": "create_assisted_farmer_api_v1_farmers_assisted_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssistedFarmerOnboardRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssistedFarmerSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/farmers/{farmer_id}/profile": {
+      "get": {
+        "tags": [
+          "farmers"
+        ],
+        "summary": "Get private farmer profile (farmer owner or assigned operator only)",
+        "operationId": "get_farmer_private_profile_api_v1_farmers__farmer_id__profile_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "farmer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Farmer Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FarmerPrivateProfileResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/crops": {
+      "get": {
+        "tags": [
+          "crops"
+        ],
+        "summary": "List bilingual crop catalog",
+        "operationId": "get_crop_catalog_api_v1_crops_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CropCatalogItem"
+                  },
+                  "type": "array",
+                  "title": "Response Get Crop Catalog Api V1 Crops Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/listings": {
+      "get": {
+        "tags": [
+          "listings"
+        ],
+        "summary": "List active produce listings with approximate locations only",
+        "operationId": "list_public_listings_api_v1_listings_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PublicListingResponse"
+                  },
+                  "type": "array",
+                  "title": "Response List Public Listings Api V1 Listings Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "listings"
+        ],
+        "summary": "Create a produce listing and linked auction (farmer or assigned operator only)",
+        "operationId": "create_listing_api_v1_listings_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateListingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FarmerListingDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/listings/mine": {
+      "get": {
+        "tags": [
+          "listings"
+        ],
+        "summary": "List listings for the authenticated farmer or assigned farmer",
+        "operationId": "list_my_listings_api_v1_listings_mine_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "farmer_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Farmer Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FarmerListingDetailResponse"
+                  },
+                  "title": "Response List My Listings Api V1 Listings Mine Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/listings/schedule-preview": {
+      "post": {
+        "tags": [
+          "listings"
+        ],
+        "summary": "Preview feasible auction, approval, recovery, and collection deadlines",
+        "operationId": "preview_schedule_api_v1_listings_schedule_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchedulePreviewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulePreviewResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/listings/{listing_id}": {
+      "patch": {
+        "tags": [
+          "listings"
+        ],
+        "summary": "Update a produce listing (owner farmer or assigned operator only)",
+        "operationId": "update_listing_api_v1_listings__listing_id__patch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "listing_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Listing Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateListingRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FarmerListingDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/listings/{listing_id}/cancel-uncommitted": {
+      "post": {
+        "tags": [
+          "listings"
+        ],
+        "summary": "Cancel uncommitted available quantity while preserving committed orders",
+        "operationId": "cancel_uncommitted_api_v1_listings__listing_id__cancel_uncommitted_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "listing_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Listing Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FarmerListingDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/listings/{listing_id}/receipt": {
+      "get": {
+        "tags": [
+          "listings"
+        ],
+        "summary": "Printable listing receipt for farmers and assisted operators",
+        "operationId": "get_listing_receipt_api_v1_listings__listing_id__receipt_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "listing_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Listing Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListingReceiptResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auctions": {
+      "get": {
+        "tags": [
+          "auctions"
+        ],
+        "summary": "List open and closing auctions",
+        "operationId": "get_open_auctions_api_v1_auctions_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AuctionDetailResponse"
+                  },
+                  "type": "array",
+                  "title": "Response Get Open Auctions Api V1 Auctions Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auctions/{auction_id}": {
+      "get": {
+        "tags": [
+          "auctions"
+        ],
+        "summary": "Get authoritative auction snapshot and eligible offers",
+        "operationId": "get_auction_api_v1_auctions__auction_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "auction_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Auction Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuctionDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auctions/{auction_id}/bids": {
+      "post": {
+        "tags": [
+          "auctions"
+        ],
+        "summary": "Place or revise a competitive bid (buyer only, transactional & idempotent)",
+        "operationId": "submit_bid_api_v1_auctions__auction_id__bids_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "auction_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Auction Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlaceBidRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuctionDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/allocations/auctions/{auction_id}/run": {
+      "post": {
+        "tags": [
+          "allocations"
+        ],
+        "summary": "Run OR-Tools CP-SAT allocation for an auction",
+        "operationId": "trigger_allocation_run_api_v1_allocations_auctions__auction_id__run_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "auction_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Auction Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunAllocationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AllocationRunResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/allocations/{run_id}/approve": {
+      "post": {
+        "tags": [
+          "allocations"
+        ],
+        "summary": "Farmer or assigned operator approves and commits an allocation run",
+        "operationId": "approve_allocation_api_v1_allocations__run_id__approve_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AllocationRunResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/allocations/auctions/{auction_id}": {
+      "get": {
+        "tags": [
+          "allocations"
+        ],
+        "summary": "List allocation runs and solver explanations for an auction",
+        "operationId": "get_auction_allocations_api_v1_allocations_auctions__auction_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "auction_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Auction Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AllocationRunResponse"
+                  },
+                  "title": "Response Get Auction Allocations Api V1 Allocations Auctions  Auction Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/allocations/runs": {
+      "get": {
+        "tags": [
+          "allocations"
+        ],
+        "summary": "List recent allocation runs across the platform (admin only)",
+        "operationId": "get_admin_allocation_runs_api_v1_allocations_runs_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AllocationRunResponse"
+                  },
+                  "type": "array",
+                  "title": "Response Get Admin Allocation Runs Api V1 Allocations Runs Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/ivr/prompts": {
+      "get": {
+        "tags": [
+          "ivr"
+        ],
+        "summary": "Get centralized Telugu/English IVR audio prompt catalog",
+        "operationId": "get_prompt_catalog_api_v1_ivr_prompts_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  },
+                  "type": "array",
+                  "title": "Response Get Prompt Catalog Api V1 Ivr Prompts Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ivr/sessions": {
+      "post": {
+        "tags": [
+          "ivr"
+        ],
+        "summary": "Start or resume an IVR session",
+        "operationId": "start_session_api_v1_ivr_sessions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartIvrSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IvrSessionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ivr/sessions/{session_id}/dtmf": {
+      "post": {
+        "tags": [
+          "ivr"
+        ],
+        "summary": "Process keypad DTMF input through the IVR state machine",
+        "operationId": "send_dtmf_api_v1_ivr_sessions__session_id__dtmf_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DtmfInputRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IvrSessionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ivr/webhooks/{provider}": {
+      "post": {
+        "tags": [
+          "ivr"
+        ],
+        "summary": "Authenticated telephony provider webhook (Asterisk/SIP or Exotel)",
+        "operationId": "provider_webhook_api_v1_ivr_webhooks__provider__post",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Provider"
+            }
+          },
+          {
+            "name": "x-provider-signature",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Provider-Signature"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Provider Webhook Api V1 Ivr Webhooks  Provider  Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ivr/voice/extract": {
+      "post": {
+        "tags": [
+          "ivr"
+        ],
+        "summary": "Extract structured listing fields from voice transcript for read-back",
+        "operationId": "extract_voice_fields_api_v1_ivr_voice_extract_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoiceExtractRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoiceExtractResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/logistics/quote": {
+      "post": {
+        "tags": [
+          "logistics"
+        ],
+        "summary": "Calculate route distance, travel estimate, and transport economics",
+        "operationId": "create_transport_quote_api_v1_logistics_quote_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransportQuoteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransportQuoteResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/logistics/map-points": {
+      "get": {
+        "tags": [
+          "logistics"
+        ],
+        "summary": "List approximate produce map points (precise coords only for authorized participants)",
+        "operationId": "get_map_points_api_v1_logistics_map_points_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MapPointResponse"
+                  },
+                  "type": "array",
+                  "title": "Response Get Map Points Api V1 Logistics Map Points Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/market-prices": {
+      "get": {
+        "tags": [
+          "market-prices"
+        ],
+        "summary": "List normalized market reference prices with freshness status",
+        "operationId": "list_market_prices_api_v1_market_prices_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MarketPriceResponse"
+                  },
+                  "type": "array",
+                  "title": "Response List Market Prices Api V1 Market Prices Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/market-prices/import": {
+      "post": {
+        "tags": [
+          "market-prices"
+        ],
+        "summary": "Import CSV or JSON agricultural market reference prices (admin/operator)",
+        "operationId": "import_market_prices_api_v1_market_prices_import_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportMarketCsvRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MarketPriceResponse"
+                  },
+                  "type": "array",
+                  "title": "Response Import Market Prices Api V1 Market Prices Import Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/notifications": {
+      "get": {
+        "tags": [
+          "notifications"
+        ],
+        "summary": "List current user notifications",
+        "operationId": "get_my_notifications_api_v1_notifications_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationResponse"
+                  },
+                  "type": "array",
+                  "title": "Response Get My Notifications Api V1 Notifications Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/notifications/{notification_id}/acknowledge": {
+      "post": {
+        "tags": [
+          "notifications"
+        ],
+        "summary": "Acknowledge and mark a notification as read",
+        "operationId": "ack_my_notification_api_v1_notifications__notification_id__acknowledge_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "notification_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Notification Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/overview": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get operational monitoring, worker, and external integration health",
+        "operationId": "admin_overview_api_v1_admin_overview_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOperationalOverview"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/users": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List farmers, buyers, and operators",
+        "operationId": "admin_list_users_api_v1_admin_users_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/UserRole"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Role"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminUserSummary"
+                  },
+                  "title": "Response Admin List Users Api V1 Admin Users Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/{user_id}/status": {
+      "patch": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Activate or deactivate a user account (records audit event)",
+        "operationId": "admin_update_user_status_api_v1_admin_users__user_id__status_patch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserStatusRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/buyers/{buyer_id}/verify": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Review and update buyer verification status (records audit event)",
+        "operationId": "admin_verify_buyer_api_v1_admin_buyers__buyer_id__verify_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "buyer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Buyer Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyBuyerRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/operator-permissions": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List operator assisted-access relationships",
+        "operationId": "admin_list_operator_permissions_api_v1_admin_operator_permissions_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/OperatorPermissionSummary"
+                  },
+                  "type": "array",
+                  "title": "Response Admin List Operator Permissions Api V1 Admin Operator Permissions Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/operator-permissions/{relationship_id}/revoke": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Revoke an operator assisted-access relationship (records audit event)",
+        "operationId": "admin_revoke_operator_permission_api_v1_admin_operator_permissions__relationship_id__revoke_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "relationship_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Relationship Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorPermissionSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/disputes": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List dispute cases for review",
+        "operationId": "admin_list_disputes_api_v1_admin_disputes_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DisputeCaseSummary"
+                  },
+                  "type": "array",
+                  "title": "Response Admin List Disputes Api V1 Admin Disputes Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/disputes/{dispute_id}/resolve": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Update or resolve a dispute case (records audit event)",
+        "operationId": "admin_resolve_dispute_api_v1_admin_disputes__dispute_id__resolve_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "dispute_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Dispute Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveDisputeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DisputeCaseSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/audit-events": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Explore immutable audit events",
+        "operationId": "admin_audit_events_api_v1_admin_audit_events_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "action",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Action"
+            }
+          },
+          {
+            "name": "resource_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Resource Type"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuditEventSummary"
+                  },
+                  "title": "Response Admin Audit Events Api V1 Admin Audit Events Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/analytics/impact": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "summary": "Get timezone-aware impact analytics (production separated from simulated demo data)",
+        "operationId": "impact_analytics_api_v1_analytics_impact_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Start date in IST (YYYY-MM-DD)",
+              "title": "Start Date"
+            },
+            "description": "Start date in IST (YYYY-MM-DD)"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "End date in IST (YYYY-MM-DD)",
+              "title": "End Date"
+            },
+            "description": "End date in IST (YYYY-MM-DD)"
+          },
+          {
+            "name": "crop_code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Crop Code"
+            }
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Location"
+            }
+          },
+          {
+            "name": "include_simulated",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Include Simulated"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpactAnalyticsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AdminOperationalOverview": {
+        "properties": {
+          "active_auctions_count": {
+            "type": "integer",
+            "title": "Active Auctions Count"
+          },
+          "pending_confirmations_count": {
+            "type": "integer",
+            "title": "Pending Confirmations Count"
+          },
+          "expired_listings_count": {
+            "type": "integer",
+            "title": "Expired Listings Count"
+          },
+          "failed_collections_count": {
+            "type": "integer",
+            "title": "Failed Collections Count"
+          },
+          "recovery_events_count": {
+            "type": "integer",
+            "title": "Recovery Events Count"
+          },
+          "open_disputes_count": {
+            "type": "integer",
+            "title": "Open Disputes Count"
+          },
+          "pending_jobs_count": {
+            "type": "integer",
+            "title": "Pending Jobs Count"
+          },
+          "failed_jobs_count": {
+            "type": "integer",
+            "title": "Failed Jobs Count"
+          },
+          "unpublished_outbox_count": {
+            "type": "integer",
+            "title": "Unpublished Outbox Count"
+          },
+          "integrations": {
+            "items": {
+              "$ref": "#/components/schemas/IntegrationHealthItem"
+            },
+            "type": "array",
+            "title": "Integrations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "active_auctions_count",
+          "pending_confirmations_count",
+          "expired_listings_count",
+          "failed_collections_count",
+          "recovery_events_count",
+          "open_disputes_count",
+          "pending_jobs_count",
+          "failed_jobs_count",
+          "unpublished_outbox_count",
+          "integrations"
+        ],
+        "title": "AdminOperationalOverview"
+      },
+      "AdminUserSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "phone_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone Number"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "district": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "District"
+          },
+          "verification_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verification Status"
+          },
+          "is_restricted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Restricted"
+          },
+          "reliability_score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reliability Score"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "full_name",
+          "role",
+          "is_active",
+          "created_at"
+        ],
+        "title": "AdminUserSummary"
+      },
+      "AllocationItemResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "buyer_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Buyer Id"
+          },
+          "allocated_quantity_grams": {
+            "type": "integer",
+            "title": "Allocated Quantity Grams"
+          },
+          "unit_price_paise_per_kg": {
+            "type": "integer",
+            "title": "Unit Price Paise Per Kg"
+          },
+          "transport_cost_paise": {
+            "type": "integer",
+            "title": "Transport Cost Paise"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "buyer_id",
+          "allocated_quantity_grams",
+          "unit_price_paise_per_kg",
+          "transport_cost_paise"
+        ],
+        "title": "AllocationItemResponse"
+      },
+      "AllocationRunResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "auction_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Auction Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AllocationRunStatus"
+          },
+          "solver_status": {
+            "type": "string",
+            "title": "Solver Status"
+          },
+          "algorithm_version": {
+            "type": "string",
+            "title": "Algorithm Version"
+          },
+          "strategy": {
+            "type": "string",
+            "title": "Strategy"
+          },
+          "gross_revenue_paise": {
+            "type": "integer",
+            "title": "Gross Revenue Paise"
+          },
+          "transportation_cost_paise": {
+            "type": "integer",
+            "title": "Transportation Cost Paise"
+          },
+          "estimated_net_revenue_paise": {
+            "type": "integer",
+            "title": "Estimated Net Revenue Paise"
+          },
+          "unallocated_quantity_grams": {
+            "type": "integer",
+            "title": "Unallocated Quantity Grams"
+          },
+          "execution_time_ms": {
+            "type": "integer",
+            "title": "Execution Time Ms"
+          },
+          "is_approved": {
+            "type": "boolean",
+            "title": "Is Approved"
+          },
+          "approved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved At"
+          },
+          "explanations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Explanations"
+          },
+          "allocations": {
+            "items": {
+              "$ref": "#/components/schemas/AllocationItemResponse"
+            },
+            "type": "array",
+            "title": "Allocations"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "auction_id",
+          "status",
+          "solver_status",
+          "algorithm_version",
+          "strategy",
+          "gross_revenue_paise",
+          "transportation_cost_paise",
+          "estimated_net_revenue_paise",
+          "unallocated_quantity_grams",
+          "execution_time_ms",
+          "is_approved",
+          "approved_at",
+          "explanations",
+          "allocations",
+          "created_at"
+        ],
+        "title": "AllocationRunResponse"
+      },
+      "AllocationRunStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING",
+          "SOLVED",
+          "INFEASIBLE",
+          "FAILED"
+        ],
+        "title": "AllocationRunStatus"
+      },
+      "AllocationStrategy": {
+        "type": "string",
+        "enum": [
+          "REVENUE_FIRST",
+          "RESCUE_FIRST"
+        ],
+        "title": "AllocationStrategy"
+      },
+      "AssistedActionAuditItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "acting_as_farmer_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acting As Farmer Id"
+          },
+          "resource_type": {
+            "type": "string",
+            "title": "Resource Type"
+          },
+          "resource_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "action",
+          "acting_as_farmer_id",
+          "resource_type",
+          "resource_id",
+          "created_at"
+        ],
+        "title": "AssistedActionAuditItem"
+      },
+      "AssistedFarmerOnboardRequest": {
+        "properties": {
+          "full_name": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 2,
+            "title": "Full Name"
+          },
+          "preferred_language": {
+            "type": "string",
+            "enum": [
+              "te",
+              "en"
+            ],
+            "title": "Preferred Language",
+            "default": "te"
+          },
+          "phone_number": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20,
+                "minLength": 10
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone Number"
+          },
+          "village": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Village"
+          },
+          "mandal": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Mandal",
+            "default": "Unspecified"
+          },
+          "district": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "District"
+          },
+          "approx_location_label": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 180
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approx Location Label"
+          },
+          "exact_pickup_address": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exact Pickup Address"
+          },
+          "consent_method": {
+            "type": "string",
+            "enum": [
+              "IN_PERSON_VERBAL",
+              "KEYPAD_PIN",
+              "SIGNED_FORM"
+            ],
+            "title": "Consent Method",
+            "default": "IN_PERSON_VERBAL"
+          },
+          "consent_confirmed": {
+            "type": "boolean",
+            "title": "Consent Confirmed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "full_name",
+          "village",
+          "district",
+          "consent_confirmed"
+        ],
+        "title": "AssistedFarmerOnboardRequest"
+      },
+      "AssistedFarmerSummary": {
+        "properties": {
+          "farmer_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Farmer Id"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "preferred_language": {
+            "type": "string",
+            "title": "Preferred Language"
+          },
+          "phone_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone Number"
+          },
+          "village": {
+            "type": "string",
+            "title": "Village"
+          },
+          "district": {
+            "type": "string",
+            "title": "District"
+          },
+          "consent_method": {
+            "type": "string",
+            "title": "Consent Method"
+          },
+          "granted_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Granted At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "farmer_id",
+          "full_name",
+          "preferred_language",
+          "phone_number",
+          "village",
+          "district",
+          "consent_method",
+          "granted_at"
+        ],
+        "title": "AssistedFarmerSummary"
+      },
+      "AuctionDetailResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "listing_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Listing Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AuctionStatus"
+          },
+          "min_bid_paise_per_kg": {
+            "type": "integer",
+            "title": "Min Bid Paise Per Kg"
+          },
+          "min_increment_paise_per_kg": {
+            "type": "integer",
+            "title": "Min Increment Paise Per Kg"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "hard_close_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Hard Close At"
+          },
+          "soft_close_trigger_seconds": {
+            "type": "integer",
+            "title": "Soft Close Trigger Seconds"
+          },
+          "soft_close_extension_seconds": {
+            "type": "integer",
+            "title": "Soft Close Extension Seconds"
+          },
+          "soft_close_max_extension_seconds": {
+            "type": "integer",
+            "title": "Soft Close Max Extension Seconds"
+          },
+          "soft_close_extended_seconds": {
+            "type": "integer",
+            "title": "Soft Close Extended Seconds"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "server_time_utc": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time Utc"
+          },
+          "available_quantity_grams": {
+            "type": "integer",
+            "title": "Available Quantity Grams"
+          },
+          "spoilage_deadline_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Spoilage Deadline At"
+          },
+          "approx_location_label": {
+            "type": "string",
+            "title": "Approx Location Label"
+          },
+          "is_direct_offer_mode": {
+            "type": "boolean",
+            "title": "Is Direct Offer Mode"
+          },
+          "highest_unit_price_paise_per_kg": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Highest Unit Price Paise Per Kg"
+          },
+          "soft_closed_triggered": {
+            "type": "boolean",
+            "title": "Soft Closed Triggered",
+            "default": false
+          },
+          "active_offers": {
+            "items": {
+              "$ref": "#/components/schemas/BidRevisionPublicResponse"
+            },
+            "type": "array",
+            "title": "Active Offers"
+          },
+          "my_bid_revisions": {
+            "items": {
+              "$ref": "#/components/schemas/BidRevisionPublicResponse"
+            },
+            "type": "array",
+            "title": "My Bid Revisions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "listing_id",
+          "status",
+          "min_bid_paise_per_kg",
+          "min_increment_paise_per_kg",
+          "starts_at",
+          "ends_at",
+          "hard_close_at",
+          "soft_close_trigger_seconds",
+          "soft_close_extension_seconds",
+          "soft_close_max_extension_seconds",
+          "soft_close_extended_seconds",
+          "version",
+          "server_time_utc",
+          "available_quantity_grams",
+          "spoilage_deadline_at",
+          "approx_location_label",
+          "is_direct_offer_mode",
+          "highest_unit_price_paise_per_kg",
+          "active_offers",
+          "my_bid_revisions"
+        ],
+        "title": "AuctionDetailResponse"
+      },
+      "AuctionStatus": {
+        "type": "string",
+        "enum": [
+          "SCHEDULED",
+          "OPEN",
+          "CLOSING",
+          "CLOSED",
+          "CANCELLED"
+        ],
+        "title": "AuctionStatus"
+      },
+      "AuditEventSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "actor_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor User Id"
+          },
+          "acting_as_farmer_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acting As Farmer Id"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "resource_type": {
+            "type": "string",
+            "title": "Resource Type"
+          },
+          "resource_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Id"
+          },
+          "metadata_json": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata Json"
+          },
+          "ip_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip Address"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "action",
+          "resource_type",
+          "metadata_json",
+          "created_at"
+        ],
+        "title": "AuditEventSummary"
+      },
+      "BidRevisionPublicResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "auction_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Auction Id"
+          },
+          "buyer_alias": {
+            "type": "string",
+            "title": "Buyer Alias"
+          },
+          "is_own_bid": {
+            "type": "boolean",
+            "title": "Is Own Bid"
+          },
+          "revision_number": {
+            "type": "integer",
+            "title": "Revision Number"
+          },
+          "bid_price_paise_per_kg": {
+            "type": "integer",
+            "title": "Bid Price Paise Per Kg"
+          },
+          "requested_quantity_grams": {
+            "type": "integer",
+            "title": "Requested Quantity Grams"
+          },
+          "min_acceptable_grams": {
+            "type": "integer",
+            "title": "Min Acceptable Grams"
+          },
+          "estimated_collection_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Estimated Collection At"
+          },
+          "transport_responsibility": {
+            "type": "string",
+            "title": "Transport Responsibility"
+          },
+          "estimated_transport_cost_paise": {
+            "type": "integer",
+            "title": "Estimated Transport Cost Paise"
+          },
+          "standby_until": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Standby Until"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "auction_id",
+          "buyer_alias",
+          "is_own_bid",
+          "revision_number",
+          "bid_price_paise_per_kg",
+          "requested_quantity_grams",
+          "min_acceptable_grams",
+          "estimated_collection_at",
+          "transport_responsibility",
+          "estimated_transport_cost_paise",
+          "standby_until",
+          "is_active",
+          "created_at"
+        ],
+        "title": "BidRevisionPublicResponse"
+      },
+      "CreateListingRequest": {
+        "properties": {
+          "farmer_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Farmer Id"
+          },
+          "crop_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Crop Id"
+          },
+          "quantity_value": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quantity Value"
+          },
+          "quantity_unit": {
+            "type": "string",
+            "enum": [
+              "GRAM",
+              "KG",
+              "QUINTAL"
+            ],
+            "title": "Quantity Unit",
+            "default": "KG"
+          },
+          "total_quantity_grams": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Quantity Grams"
+          },
+          "floor_price_paise_per_kg": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Floor Price Paise Per Kg"
+          },
+          "harvested_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Harvested At"
+          },
+          "spoilage_deadline_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Spoilage Deadline At"
+          },
+          "urgency_option": {
+            "type": "string",
+            "enum": [
+              "WITHIN_2H",
+              "WITHIN_6H",
+              "WITHIN_12H",
+              "WITHIN_24H",
+              "CUSTOM"
+            ],
+            "title": "Urgency Option",
+            "default": "WITHIN_24H"
+          },
+          "quality_grade": {
+            "type": "string",
+            "enum": [
+              "GRADE_A",
+              "GRADE_B",
+              "STANDARD"
+            ],
+            "title": "Quality Grade",
+            "default": "GRADE_A"
+          },
+          "photo_urls": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 5,
+            "title": "Photo Urls"
+          },
+          "transport_responsibility": {
+            "type": "string",
+            "enum": [
+              "BUYER_PICKUP",
+              "FARMER_DELIVERY",
+              "SHARED"
+            ],
+            "title": "Transport Responsibility",
+            "default": "BUYER_PICKUP"
+          },
+          "auto_allocate_approved": {
+            "type": "boolean",
+            "title": "Auto Allocate Approved",
+            "default": false
+          },
+          "approx_location_label": {
+            "type": "string",
+            "maxLength": 180,
+            "minLength": 2,
+            "title": "Approx Location Label"
+          },
+          "approx_latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approx Latitude"
+          },
+          "approx_longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approx Longitude"
+          },
+          "exact_pickup_address": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Exact Pickup Address"
+          },
+          "consent_confirmed": {
+            "type": "boolean",
+            "title": "Consent Confirmed",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "crop_id",
+          "floor_price_paise_per_kg",
+          "harvested_at",
+          "approx_location_label",
+          "exact_pickup_address"
+        ],
+        "title": "CreateListingRequest"
+      },
+      "CropCatalogItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name_en": {
+            "type": "string",
+            "title": "Name En"
+          },
+          "name_te": {
+            "type": "string",
+            "title": "Name Te"
+          },
+          "unit_label_en": {
+            "type": "string",
+            "title": "Unit Label En"
+          },
+          "unit_label_te": {
+            "type": "string",
+            "title": "Unit Label Te"
+          },
+          "default_shelf_life_hours": {
+            "type": "integer",
+            "title": "Default Shelf Life Hours"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "code",
+          "name_en",
+          "name_te",
+          "unit_label_en",
+          "unit_label_te",
+          "default_shelf_life_hours"
+        ],
+        "title": "CropCatalogItem"
+      },
+      "CropImpactPoint": {
+        "properties": {
+          "crop_code": {
+            "type": "string",
+            "title": "Crop Code"
+          },
+          "crop_name_en": {
+            "type": "string",
+            "title": "Crop Name En"
+          },
+          "crop_name_te": {
+            "type": "string",
+            "title": "Crop Name Te"
+          },
+          "listed_kg": {
+            "type": "number",
+            "title": "Listed Kg"
+          },
+          "collected_kg": {
+            "type": "number",
+            "title": "Collected Kg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "crop_code",
+          "crop_name_en",
+          "crop_name_te",
+          "listed_kg",
+          "collected_kg"
+        ],
+        "title": "CropImpactPoint"
+      },
+      "DailyImpactPoint": {
+        "properties": {
+          "date_ist": {
+            "type": "string",
+            "title": "Date Ist"
+          },
+          "listed_kg": {
+            "type": "number",
+            "title": "Listed Kg"
+          },
+          "allocated_kg": {
+            "type": "number",
+            "title": "Allocated Kg"
+          },
+          "collected_kg": {
+            "type": "number",
+            "title": "Collected Kg"
+          },
+          "cancelled_kg": {
+            "type": "number",
+            "title": "Cancelled Kg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date_ist",
+          "listed_kg",
+          "allocated_kg",
+          "collected_kg",
+          "cancelled_kg"
+        ],
+        "title": "DailyImpactPoint"
+      },
+      "DisputeCaseSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "order_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Order Id"
+          },
+          "raised_by_user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Raised By User Id"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "resolution_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution Notes"
+          },
+          "resolved_by_admin_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved By Admin Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "order_id",
+          "raised_by_user_id",
+          "reason",
+          "status",
+          "created_at"
+        ],
+        "title": "DisputeCaseSummary"
+      },
+      "DtmfInputRequest": {
+        "properties": {
+          "digits": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Digits"
+          },
+          "webhook_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Webhook Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "digits"
+        ],
+        "title": "DtmfInputRequest"
+      },
+      "FarmerListingDetailResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "crop_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Crop Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ListingStatus"
+          },
+          "available_quantity_grams": {
+            "type": "integer",
+            "title": "Available Quantity Grams"
+          },
+          "floor_price_paise_per_kg": {
+            "type": "integer",
+            "title": "Floor Price Paise Per Kg"
+          },
+          "harvested_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Harvested At"
+          },
+          "spoilage_deadline_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Spoilage Deadline At"
+          },
+          "approx_location_label": {
+            "type": "string",
+            "title": "Approx Location Label"
+          },
+          "approx_latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approx Latitude"
+          },
+          "approx_longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approx Longitude"
+          },
+          "quality_grade": {
+            "type": "string",
+            "title": "Quality Grade"
+          },
+          "transport_responsibility": {
+            "type": "string",
+            "title": "Transport Responsibility"
+          },
+          "urgency_option": {
+            "type": "string",
+            "title": "Urgency Option"
+          },
+          "is_direct_offer_mode": {
+            "type": "boolean",
+            "title": "Is Direct Offer Mode"
+          },
+          "is_simulated": {
+            "type": "boolean",
+            "title": "Is Simulated"
+          },
+          "farmer_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Farmer Id"
+          },
+          "created_by_user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Created By User Id"
+          },
+          "total_quantity_grams": {
+            "type": "integer",
+            "title": "Total Quantity Grams"
+          },
+          "reserved_quantity_grams": {
+            "type": "integer",
+            "title": "Reserved Quantity Grams"
+          },
+          "collected_quantity_grams": {
+            "type": "integer",
+            "title": "Collected Quantity Grams"
+          },
+          "auto_allocate_approved": {
+            "type": "boolean",
+            "title": "Auto Allocate Approved"
+          },
+          "bidding_initial_close_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bidding Initial Close At"
+          },
+          "bidding_hard_close_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bidding Hard Close At"
+          },
+          "farmer_approval_deadline_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Farmer Approval Deadline At"
+          },
+          "buyer_confirmation_deadline_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Buyer Confirmation Deadline At"
+          },
+          "recovery_deadline_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recovery Deadline At"
+          },
+          "auction_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Auction Id"
+          },
+          "auction_status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AuctionStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "crop_id",
+          "status",
+          "available_quantity_grams",
+          "floor_price_paise_per_kg",
+          "harvested_at",
+          "spoilage_deadline_at",
+          "approx_location_label",
+          "approx_latitude",
+          "approx_longitude",
+          "quality_grade",
+          "transport_responsibility",
+          "urgency_option",
+          "is_direct_offer_mode",
+          "is_simulated",
+          "farmer_id",
+          "created_by_user_id",
+          "total_quantity_grams",
+          "reserved_quantity_grams",
+          "collected_quantity_grams",
+          "auto_allocate_approved",
+          "bidding_initial_close_at",
+          "bidding_hard_close_at",
+          "farmer_approval_deadline_at",
+          "buyer_confirmation_deadline_at",
+          "recovery_deadline_at",
+          "auction_id",
+          "auction_status"
+        ],
+        "title": "FarmerListingDetailResponse",
+        "description": "Owner/assigned-operator view including inventory breakdown and auction schedule."
+      },
+      "FarmerPrivateProfileResponse": {
+        "properties": {
+          "farmer_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Farmer Id"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "phone_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone Number"
+          },
+          "village": {
+            "type": "string",
+            "title": "Village"
+          },
+          "mandal": {
+            "type": "string",
+            "title": "Mandal"
+          },
+          "district": {
+            "type": "string",
+            "title": "District"
+          },
+          "state": {
+            "type": "string",
+            "title": "State"
+          },
+          "exact_pickup_address": {
+            "type": "string",
+            "title": "Exact Pickup Address"
+          }
+        },
+        "type": "object",
+        "required": [
+          "farmer_id",
+          "full_name",
+          "phone_number",
+          "village",
+          "mandal",
+          "district",
+          "state",
+          "exact_pickup_address"
+        ],
+        "title": "FarmerPrivateProfileResponse"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "ok",
+            "title": "Status"
+          },
+          "service": {
+            "type": "string",
+            "title": "Service"
+          },
+          "environment": {
+            "type": "string",
+            "title": "Environment"
+          },
+          "timestamp_utc": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp Utc"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "service",
+          "environment",
+          "timestamp_utc"
+        ],
+        "title": "HealthResponse",
+        "description": "Liveness probe response."
+      },
+      "ImpactAnalyticsResponse": {
+        "properties": {
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "crop_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Crop Code"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "timezone": {
+            "type": "string",
+            "title": "Timezone",
+            "default": "Asia/Kolkata"
+          },
+          "production": {
+            "$ref": "#/components/schemas/ImpactMetricsSummary"
+          },
+          "demo_simulated": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ImpactMetricsSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "daily_series": {
+            "items": {
+              "$ref": "#/components/schemas/DailyImpactPoint"
+            },
+            "type": "array",
+            "title": "Daily Series"
+          },
+          "crop_breakdown": {
+            "items": {
+              "$ref": "#/components/schemas/CropImpactPoint"
+            },
+            "type": "array",
+            "title": "Crop Breakdown"
+          }
+        },
+        "type": "object",
+        "required": [
+          "production",
+          "daily_series",
+          "crop_breakdown"
+        ],
+        "title": "ImpactAnalyticsResponse"
+      },
+      "ImpactMetricsSummary": {
+        "properties": {
+          "is_simulated": {
+            "type": "boolean",
+            "title": "Is Simulated"
+          },
+          "dataset_label": {
+            "type": "string",
+            "title": "Dataset Label"
+          },
+          "produce_listed_grams": {
+            "type": "integer",
+            "title": "Produce Listed Grams"
+          },
+          "produce_allocated_grams": {
+            "type": "integer",
+            "title": "Produce Allocated Grams"
+          },
+          "produce_confirmed_grams": {
+            "type": "integer",
+            "title": "Produce Confirmed Grams"
+          },
+          "produce_collected_grams": {
+            "type": "integer",
+            "title": "Produce Collected Grams"
+          },
+          "surplus_produce_collected_grams": {
+            "type": "integer",
+            "title": "Surplus Produce Collected Grams"
+          },
+          "rescued_from_waste_grams": {
+            "type": "integer",
+            "title": "Rescued From Waste Grams"
+          },
+          "unmatched_produce_grams": {
+            "type": "integer",
+            "title": "Unmatched Produce Grams"
+          },
+          "cancelled_quantity_grams": {
+            "type": "integer",
+            "title": "Cancelled Quantity Grams"
+          },
+          "recovered_after_cancellation_grams": {
+            "type": "integer",
+            "title": "Recovered After Cancellation Grams"
+          },
+          "gross_transaction_value_paise": {
+            "type": "integer",
+            "title": "Gross Transaction Value Paise"
+          },
+          "estimated_net_sales_revenue_paise": {
+            "type": "integer",
+            "title": "Estimated Net Sales Revenue Paise"
+          },
+          "reported_payment_received_paise": {
+            "type": "integer",
+            "title": "Reported Payment Received Paise"
+          },
+          "average_buyer_matching_time_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Buyer Matching Time Seconds"
+          },
+          "buyer_completion_rate_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Buyer Completion Rate Percent"
+          },
+          "has_data": {
+            "type": "boolean",
+            "title": "Has Data"
+          },
+          "methodology_note": {
+            "type": "string",
+            "title": "Methodology Note"
+          },
+          "baseline_note": {
+            "type": "string",
+            "title": "Baseline Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "is_simulated",
+          "dataset_label",
+          "produce_listed_grams",
+          "produce_allocated_grams",
+          "produce_confirmed_grams",
+          "produce_collected_grams",
+          "surplus_produce_collected_grams",
+          "rescued_from_waste_grams",
+          "unmatched_produce_grams",
+          "cancelled_quantity_grams",
+          "recovered_after_cancellation_grams",
+          "gross_transaction_value_paise",
+          "estimated_net_sales_revenue_paise",
+          "reported_payment_received_paise",
+          "has_data",
+          "methodology_note",
+          "baseline_note"
+        ],
+        "title": "ImpactMetricsSummary"
+      },
+      "ImportMarketCsvRequest": {
+        "properties": {
+          "csv_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Csv Text"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ImportMarketJsonItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "is_simulated": {
+            "type": "boolean",
+            "title": "Is Simulated",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "ImportMarketCsvRequest"
+      },
+      "ImportMarketJsonItem": {
+        "properties": {
+          "commodity_code": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 1,
+            "title": "Commodity Code"
+          },
+          "commodity_name_en": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Commodity Name En"
+          },
+          "commodity_name_te": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Commodity Name Te"
+          },
+          "market_name": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 1,
+            "title": "Market Name"
+          },
+          "district": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "District"
+          },
+          "state": {
+            "type": "string",
+            "title": "State",
+            "default": "Andhra Pradesh"
+          },
+          "grade": {
+            "type": "string",
+            "title": "Grade",
+            "default": "FAQ"
+          },
+          "price_type": {
+            "type": "string",
+            "title": "Price Type",
+            "default": "MODAL"
+          },
+          "original_unit": {
+            "type": "string",
+            "enum": [
+              "KG",
+              "QUINTAL"
+            ],
+            "title": "Original Unit",
+            "default": "QUINTAL"
+          },
+          "original_price_paise": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Original Price Paise"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Observed At"
+          },
+          "source_name": {
+            "type": "string",
+            "title": "Source Name",
+            "default": "JSON_IMPORT"
+          },
+          "is_simulated": {
+            "type": "boolean",
+            "title": "Is Simulated",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "commodity_code",
+          "commodity_name_en",
+          "commodity_name_te",
+          "market_name",
+          "district",
+          "original_price_paise",
+          "observed_at"
+        ],
+        "title": "ImportMarketJsonItem"
+      },
+      "IntegrationHealthItem": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "configured": {
+            "type": "boolean",
+            "title": "Configured"
+          },
+          "mode": {
+            "type": "string",
+            "title": "Mode"
+          },
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "configured",
+          "mode",
+          "detail"
+        ],
+        "title": "IntegrationHealthItem"
+      },
+      "IvrPromptResponse": {
+        "properties": {
+          "prompt_key": {
+            "type": "string",
+            "title": "Prompt Key"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language"
+          },
+          "audio_url": {
+            "type": "string",
+            "title": "Audio Url"
+          },
+          "audio_available": {
+            "type": "boolean",
+            "title": "Audio Available"
+          },
+          "transcript": {
+            "type": "string",
+            "title": "Transcript"
+          },
+          "number_audio_tokens": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Number Audio Tokens"
+          }
+        },
+        "type": "object",
+        "required": [
+          "prompt_key",
+          "language",
+          "audio_url",
+          "audio_available",
+          "transcript",
+          "number_audio_tokens"
+        ],
+        "title": "IvrPromptResponse"
+      },
+      "IvrSessionResponse": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id"
+          },
+          "session_state": {
+            "type": "string",
+            "title": "Session State"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language"
+          },
+          "caller_phone": {
+            "type": "string",
+            "title": "Caller Phone"
+          },
+          "retry_count": {
+            "type": "integer",
+            "title": "Retry Count"
+          },
+          "draft": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Draft"
+          },
+          "prompt": {
+            "$ref": "#/components/schemas/IvrPromptResponse"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "session_state",
+          "language",
+          "caller_phone",
+          "retry_count",
+          "draft",
+          "prompt"
+        ],
+        "title": "IvrSessionResponse"
+      },
+      "ListingReceiptResponse": {
+        "properties": {
+          "listing_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Listing Id"
+          },
+          "farmer_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Farmer Id"
+          },
+          "farmer_name": {
+            "type": "string",
+            "title": "Farmer Name"
+          },
+          "crop_name_en": {
+            "type": "string",
+            "title": "Crop Name En"
+          },
+          "crop_name_te": {
+            "type": "string",
+            "title": "Crop Name Te"
+          },
+          "total_quantity_grams": {
+            "type": "integer",
+            "title": "Total Quantity Grams"
+          },
+          "floor_price_paise_per_kg": {
+            "type": "integer",
+            "title": "Floor Price Paise Per Kg"
+          },
+          "collection_deadline_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Collection Deadline At"
+          },
+          "operator_or_centre_info": {
+            "type": "string",
+            "title": "Operator Or Centre Info"
+          }
+        },
+        "type": "object",
+        "required": [
+          "listing_id",
+          "farmer_id",
+          "farmer_name",
+          "crop_name_en",
+          "crop_name_te",
+          "total_quantity_grams",
+          "floor_price_paise_per_kg",
+          "collection_deadline_at",
+          "operator_or_centre_info"
+        ],
+        "title": "ListingReceiptResponse"
+      },
+      "ListingStatus": {
+        "type": "string",
+        "enum": [
+          "DRAFT",
+          "ACTIVE",
+          "PARTIALLY_ALLOCATED",
+          "FULLY_ALLOCATED",
+          "ALLOCATED",
+          "COMPLETED",
+          "EXPIRED",
+          "CANCELLED"
+        ],
+        "title": "ListingStatus"
+      },
+      "LoginRequest": {
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 3,
+            "title": "Identifier"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "identifier",
+          "password"
+        ],
+        "title": "LoginRequest"
+      },
+      "LogoutResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "logged_out",
+            "title": "Status",
+            "default": "logged_out"
+          }
+        },
+        "type": "object",
+        "title": "LogoutResponse"
+      },
+      "MapPointResponse": {
+        "properties": {
+          "listing_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Listing Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "latitude": {
+            "type": "number",
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "title": "Longitude"
+          },
+          "is_exact": {
+            "type": "boolean",
+            "title": "Is Exact"
+          },
+          "exact_pickup_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exact Pickup Address"
+          },
+          "available_quantity_grams": {
+            "type": "integer",
+            "title": "Available Quantity Grams"
+          },
+          "floor_price_paise_per_kg": {
+            "type": "integer",
+            "title": "Floor Price Paise Per Kg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "listing_id",
+          "label",
+          "latitude",
+          "longitude",
+          "is_exact",
+          "available_quantity_grams",
+          "floor_price_paise_per_kg"
+        ],
+        "title": "MapPointResponse"
+      },
+      "MarketPriceResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "commodity_code": {
+            "type": "string",
+            "title": "Commodity Code"
+          },
+          "commodity_name_en": {
+            "type": "string",
+            "title": "Commodity Name En"
+          },
+          "commodity_name_te": {
+            "type": "string",
+            "title": "Commodity Name Te"
+          },
+          "market_name": {
+            "type": "string",
+            "title": "Market Name"
+          },
+          "district": {
+            "type": "string",
+            "title": "District"
+          },
+          "state": {
+            "type": "string",
+            "title": "State"
+          },
+          "grade": {
+            "type": "string",
+            "title": "Grade"
+          },
+          "price_type": {
+            "type": "string",
+            "title": "Price Type"
+          },
+          "original_unit": {
+            "type": "string",
+            "title": "Original Unit"
+          },
+          "original_price_paise": {
+            "type": "integer",
+            "title": "Original Price Paise"
+          },
+          "normalized_price_paise_per_kg": {
+            "type": "integer",
+            "title": "Normalized Price Paise Per Kg"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Observed At"
+          },
+          "source_name": {
+            "type": "string",
+            "title": "Source Name"
+          },
+          "is_stale": {
+            "type": "boolean",
+            "title": "Is Stale"
+          },
+          "is_simulated": {
+            "type": "boolean",
+            "title": "Is Simulated"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer",
+            "default": "Reference prices are historical/external observations only and are not guaranteed selling prices."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "commodity_code",
+          "commodity_name_en",
+          "commodity_name_te",
+          "market_name",
+          "district",
+          "state",
+          "grade",
+          "price_type",
+          "original_unit",
+          "original_price_paise",
+          "normalized_price_paise_per_kg",
+          "observed_at",
+          "source_name",
+          "is_stale",
+          "is_simulated"
+        ],
+        "title": "MarketPriceResponse"
+      },
+      "NotificationResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "event_type": {
+            "type": "string",
+            "title": "Event Type"
+          },
+          "channel": {
+            "type": "string",
+            "title": "Channel"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "body": {
+            "type": "string",
+            "title": "Body"
+          },
+          "provider_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Message"
+          },
+          "metadata_json": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata Json"
+          },
+          "is_read": {
+            "type": "boolean",
+            "title": "Is Read"
+          },
+          "delivered_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delivered At"
+          },
+          "acknowledged_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acknowledged At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "event_id",
+          "event_type",
+          "channel",
+          "status",
+          "title",
+          "body",
+          "metadata_json",
+          "is_read",
+          "created_at"
+        ],
+        "title": "NotificationResponse"
+      },
+      "OperatorAssistedOverviewResponse": {
+        "properties": {
+          "farmers": {
+            "items": {
+              "$ref": "#/components/schemas/AssistedFarmerSummary"
+            },
+            "type": "array",
+            "title": "Farmers"
+          },
+          "audit_history": {
+            "items": {
+              "$ref": "#/components/schemas/AssistedActionAuditItem"
+            },
+            "type": "array",
+            "title": "Audit History"
+          }
+        },
+        "type": "object",
+        "required": [
+          "farmers",
+          "audit_history"
+        ],
+        "title": "OperatorAssistedOverviewResponse"
+      },
+      "OperatorPermissionSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "operator_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Operator Id"
+          },
+          "operator_name": {
+            "type": "string",
+            "title": "Operator Name"
+          },
+          "farmer_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Farmer Id"
+          },
+          "farmer_name": {
+            "type": "string",
+            "title": "Farmer Name"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "consent_method": {
+            "type": "string",
+            "title": "Consent Method"
+          },
+          "granted_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Granted At"
+          },
+          "revoked_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revoked At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "operator_id",
+          "operator_name",
+          "farmer_id",
+          "farmer_name",
+          "is_active",
+          "consent_method",
+          "granted_at"
+        ],
+        "title": "OperatorPermissionSummary"
+      },
+      "PinLoginRequest": {
+        "properties": {
+          "phone_number": {
+            "type": "string",
+            "maxLength": 20,
+            "minLength": 10,
+            "title": "Phone Number"
+          },
+          "pin": {
+            "type": "string",
+            "pattern": "^\\d{4,6}$",
+            "title": "Pin"
+          }
+        },
+        "type": "object",
+        "required": [
+          "phone_number",
+          "pin"
+        ],
+        "title": "PinLoginRequest"
+      },
+      "PlaceBidRequest": {
+        "properties": {
+          "bid_price_paise_per_kg": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Bid Price Paise Per Kg"
+          },
+          "requested_quantity_grams": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Requested Quantity Grams"
+          },
+          "min_acceptable_grams": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Min Acceptable Grams"
+          },
+          "estimated_collection_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Estimated Collection At"
+          },
+          "transport_responsibility": {
+            "type": "string",
+            "enum": [
+              "BUYER_PICKUP",
+              "FARMER_DELIVERY",
+              "SHARED"
+            ],
+            "title": "Transport Responsibility",
+            "default": "BUYER_PICKUP"
+          },
+          "estimated_transport_cost_paise": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Estimated Transport Cost Paise",
+            "default": 0
+          },
+          "standby_until": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Standby Until"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 4,
+            "title": "Idempotency Key"
+          }
+        },
+        "type": "object",
+        "required": [
+          "bid_price_paise_per_kg",
+          "requested_quantity_grams",
+          "min_acceptable_grams",
+          "estimated_collection_at",
+          "standby_until",
+          "idempotency_key"
+        ],
+        "title": "PlaceBidRequest"
+      },
+      "PublicListingResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "crop_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Crop Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ListingStatus"
+          },
+          "available_quantity_grams": {
+            "type": "integer",
+            "title": "Available Quantity Grams"
+          },
+          "floor_price_paise_per_kg": {
+            "type": "integer",
+            "title": "Floor Price Paise Per Kg"
+          },
+          "harvested_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Harvested At"
+          },
+          "spoilage_deadline_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Spoilage Deadline At"
+          },
+          "approx_location_label": {
+            "type": "string",
+            "title": "Approx Location Label"
+          },
+          "approx_latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approx Latitude"
+          },
+          "approx_longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approx Longitude"
+          },
+          "quality_grade": {
+            "type": "string",
+            "title": "Quality Grade"
+          },
+          "transport_responsibility": {
+            "type": "string",
+            "title": "Transport Responsibility"
+          },
+          "urgency_option": {
+            "type": "string",
+            "title": "Urgency Option"
+          },
+          "is_direct_offer_mode": {
+            "type": "boolean",
+            "title": "Is Direct Offer Mode"
+          },
+          "is_simulated": {
+            "type": "boolean",
+            "title": "Is Simulated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "crop_id",
+          "status",
+          "available_quantity_grams",
+          "floor_price_paise_per_kg",
+          "harvested_at",
+          "spoilage_deadline_at",
+          "approx_location_label",
+          "approx_latitude",
+          "approx_longitude",
+          "quality_grade",
+          "transport_responsibility",
+          "urgency_option",
+          "is_direct_offer_mode",
+          "is_simulated"
+        ],
+        "title": "PublicListingResponse",
+        "description": "Public listing view exposing only approximate location (never farmer PII)."
+      },
+      "ReadinessResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "not_ready"
+            ],
+            "title": "Status"
+          },
+          "database": {
+            "type": "string",
+            "enum": [
+              "connected",
+              "disconnected"
+            ],
+            "title": "Database"
+          },
+          "timestamp_utc": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp Utc"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "database",
+          "timestamp_utc"
+        ],
+        "title": "ReadinessResponse",
+        "description": "Readiness probe response including database connectivity."
+      },
+      "RefreshRequest": {
+        "properties": {
+          "refresh_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refresh Token"
+          }
+        },
+        "type": "object",
+        "title": "RefreshRequest"
+      },
+      "RegisterRequest": {
+        "properties": {
+          "full_name": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 2,
+            "title": "Full Name"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "FARMER",
+              "BUYER"
+            ],
+            "title": "Role"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "phone_number": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20,
+                "minLength": 10
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone Number"
+          },
+          "password": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128,
+                "minLength": 8
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Password"
+          },
+          "pin": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d{4,6}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pin"
+          },
+          "preferred_language": {
+            "type": "string",
+            "enum": [
+              "te",
+              "en"
+            ],
+            "title": "Preferred Language",
+            "default": "te"
+          },
+          "village": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Village"
+          },
+          "mandal": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mandal"
+          },
+          "district": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "District"
+          },
+          "exact_pickup_address": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exact Pickup Address"
+          },
+          "business_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 180
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Business Name"
+          },
+          "buyer_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Buyer Type",
+            "default": "wholesaler"
+          }
+        },
+        "type": "object",
+        "required": [
+          "full_name",
+          "role"
+        ],
+        "title": "RegisterRequest"
+      },
+      "ResolveDisputeRequest": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "UNDER_REVIEW",
+              "RESOLVED"
+            ],
+            "title": "Status"
+          },
+          "resolution_notes": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Resolution Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "resolution_notes"
+        ],
+        "title": "ResolveDisputeRequest"
+      },
+      "RunAllocationRequest": {
+        "properties": {
+          "strategy": {
+            "$ref": "#/components/schemas/AllocationStrategy",
+            "default": "REVENUE_FIRST"
+          },
+          "min_net_revenue_paise": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Min Net Revenue Paise",
+            "default": 0
+          },
+          "time_limit_seconds": {
+            "type": "number",
+            "maximum": 30.0,
+            "exclusiveMinimum": 0.01,
+            "title": "Time Limit Seconds",
+            "default": 2.0
+          }
+        },
+        "type": "object",
+        "title": "RunAllocationRequest"
+      },
+      "SchedulePreviewRequest": {
+        "properties": {
+          "urgency_option": {
+            "type": "string",
+            "enum": [
+              "WITHIN_2H",
+              "WITHIN_6H",
+              "WITHIN_12H",
+              "WITHIN_24H",
+              "CUSTOM"
+            ],
+            "title": "Urgency Option"
+          },
+          "custom_collection_deadline_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Custom Collection Deadline At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "urgency_option"
+        ],
+        "title": "SchedulePreviewRequest"
+      },
+      "SchedulePreviewResponse": {
+        "properties": {
+          "urgency_option": {
+            "type": "string",
+            "enum": [
+              "WITHIN_2H",
+              "WITHIN_6H",
+              "WITHIN_12H",
+              "WITHIN_24H",
+              "CUSTOM"
+            ],
+            "title": "Urgency Option"
+          },
+          "is_direct_offer_mode": {
+            "type": "boolean",
+            "title": "Is Direct Offer Mode"
+          },
+          "auction_opens_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Auction Opens At"
+          },
+          "initial_bidding_close_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Initial Bidding Close At"
+          },
+          "hard_bidding_close_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Hard Bidding Close At"
+          },
+          "farmer_approval_deadline_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Farmer Approval Deadline At"
+          },
+          "buyer_confirmation_deadline_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Buyer Confirmation Deadline At"
+          },
+          "recovery_deadline_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Recovery Deadline At"
+          },
+          "collection_deadline_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Collection Deadline At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "urgency_option",
+          "is_direct_offer_mode",
+          "auction_opens_at",
+          "initial_bidding_close_at",
+          "hard_bidding_close_at",
+          "farmer_approval_deadline_at",
+          "buyer_confirmation_deadline_at",
+          "recovery_deadline_at",
+          "collection_deadline_at"
+        ],
+        "title": "SchedulePreviewResponse"
+      },
+      "StartIvrSessionRequest": {
+        "properties": {
+          "caller_phone": {
+            "type": "string",
+            "maxLength": 20,
+            "minLength": 10,
+            "title": "Caller Phone"
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "te",
+              "en"
+            ],
+            "title": "Language",
+            "default": "te"
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "BROWSER_SIMULATOR",
+              "ASTERISK_SIP",
+              "EXOTEL"
+            ],
+            "title": "Provider",
+            "default": "BROWSER_SIMULATOR"
+          },
+          "external_call_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Call Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "caller_phone"
+        ],
+        "title": "StartIvrSessionRequest"
+      },
+      "TokenResponse": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "token_type": {
+            "type": "string",
+            "const": "bearer",
+            "title": "Token Type",
+            "default": "bearer"
+          },
+          "expires_in_seconds": {
+            "type": "integer",
+            "title": "Expires In Seconds"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserSummary"
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token",
+          "expires_in_seconds",
+          "user"
+        ],
+        "title": "TokenResponse"
+      },
+      "TransportQuoteRequest": {
+        "properties": {
+          "listing_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Listing Id"
+          },
+          "dest_latitude": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 90.0,
+                "minimum": -90.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dest Latitude"
+          },
+          "dest_longitude": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 180.0,
+                "minimum": -180.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dest Longitude"
+          },
+          "quantity_grams": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Quantity Grams"
+          },
+          "transport_responsibility": {
+            "type": "string",
+            "enum": [
+              "BUYER_PICKUP",
+              "FARMER_DELIVERY",
+              "SHARED"
+            ],
+            "title": "Transport Responsibility",
+            "default": "BUYER_PICKUP"
+          },
+          "fixed_pickup_cost_paise": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Fixed Pickup Cost Paise",
+            "default": 5000
+          }
+        },
+        "type": "object",
+        "required": [
+          "listing_id",
+          "quantity_grams"
+        ],
+        "title": "TransportQuoteRequest"
+      },
+      "TransportQuoteResponse": {
+        "properties": {
+          "quote_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Quote Id"
+          },
+          "listing_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Listing Id"
+          },
+          "distance_meters": {
+            "type": "integer",
+            "title": "Distance Meters"
+          },
+          "distance_kind": {
+            "type": "string",
+            "title": "Distance Kind"
+          },
+          "is_approximate": {
+            "type": "boolean",
+            "title": "Is Approximate"
+          },
+          "estimated_travel_seconds": {
+            "type": "integer",
+            "title": "Estimated Travel Seconds"
+          },
+          "fixed_pickup_cost_paise": {
+            "type": "integer",
+            "title": "Fixed Pickup Cost Paise"
+          },
+          "variable_cost_paise": {
+            "type": "integer",
+            "title": "Variable Cost Paise"
+          },
+          "total_transport_cost_paise": {
+            "type": "integer",
+            "title": "Total Transport Cost Paise"
+          },
+          "transport_responsibility": {
+            "type": "string",
+            "enum": [
+              "BUYER_PICKUP",
+              "FARMER_DELIVERY",
+              "SHARED"
+            ],
+            "title": "Transport Responsibility"
+          },
+          "farmer_paid_cost_paise": {
+            "type": "integer",
+            "title": "Farmer Paid Cost Paise"
+          },
+          "buyer_paid_cost_paise": {
+            "type": "integer",
+            "title": "Buyer Paid Cost Paise"
+          },
+          "gross_sales_revenue_paise": {
+            "type": "integer",
+            "title": "Gross Sales Revenue Paise"
+          },
+          "estimated_net_sales_revenue_paise": {
+            "type": "integer",
+            "title": "Estimated Net Sales Revenue Paise"
+          },
+          "provider_name": {
+            "type": "string",
+            "title": "Provider Name"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "quote_id",
+          "listing_id",
+          "distance_meters",
+          "distance_kind",
+          "is_approximate",
+          "estimated_travel_seconds",
+          "fixed_pickup_cost_paise",
+          "variable_cost_paise",
+          "total_transport_cost_paise",
+          "transport_responsibility",
+          "farmer_paid_cost_paise",
+          "buyer_paid_cost_paise",
+          "gross_sales_revenue_paise",
+          "estimated_net_sales_revenue_paise",
+          "provider_name",
+          "disclaimer"
+        ],
+        "title": "TransportQuoteResponse"
+      },
+      "UpdateListingRequest": {
+        "properties": {
+          "floor_price_paise_per_kg": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Floor Price Paise Per Kg"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ListingStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "title": "UpdateListingRequest"
+      },
+      "UpdateUserStatusRequest": {
+        "properties": {
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 3,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "is_active",
+          "reason"
+        ],
+        "title": "UpdateUserStatusRequest"
+      },
+      "UserRole": {
+        "type": "string",
+        "enum": [
+          "FARMER",
+          "BUYER",
+          "OPERATOR",
+          "ADMIN"
+        ],
+        "title": "UserRole"
+      },
+      "UserSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole"
+          },
+          "preferred_language": {
+            "type": "string",
+            "title": "Preferred Language"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "full_name",
+          "role",
+          "preferred_language",
+          "is_active"
+        ],
+        "title": "UserSummary"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VerifyBuyerRequest": {
+        "properties": {
+          "verification_status": {
+            "type": "string",
+            "enum": [
+              "VERIFIED",
+              "REJECTED",
+              "PENDING"
+            ],
+            "title": "Verification Status"
+          },
+          "is_restricted": {
+            "type": "boolean",
+            "title": "Is Restricted",
+            "default": false
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "verification_status"
+        ],
+        "title": "VerifyBuyerRequest"
+      },
+      "VoiceExtractRequest": {
+        "properties": {
+          "transcript": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Transcript"
+          }
+        },
+        "type": "object",
+        "required": [
+          "transcript"
+        ],
+        "title": "VoiceExtractRequest"
+      },
+      "VoiceExtractResponse": {
+        "properties": {
+          "available": {
+            "type": "boolean",
+            "title": "Available"
+          },
+          "transcript": {
+            "type": "string",
+            "title": "Transcript"
+          },
+          "crop_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Crop Code"
+          },
+          "quantity_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quantity Kg"
+          },
+          "price_inr_per_kg": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Inr Per Kg"
+          },
+          "urgency_option": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Urgency Option"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "available",
+          "transcript",
+          "crop_code",
+          "quantity_kg",
+          "price_inr_per_kg",
+          "urgency_option"
+        ],
+        "title": "VoiceExtractResponse"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

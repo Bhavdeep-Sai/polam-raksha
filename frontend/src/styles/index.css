@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-primary: #205438;
+  --color-brand-primary-hover: #18402a;
+  --color-brand-secondary: #548c55;
+  --color-brand-accent: #d9aa44;
+  --color-brand-bg: #f7f6ee;
+  --color-brand-surface: #ffffff;
+  --color-brand-muted: #efece0;
+  --color-brand-border: #d5d0be;
+  --color-brand-ink: #18241d;
+  --color-brand-ink-muted: #4a5950;
+}
+
+@layer base {
+  html {
+    background-color: #f7f6ee;
+    color: #18241d;
+    font-family: "Inter", "Noto Sans Telugu", system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: #f7f6ee;
+    color: #18241d;
+    overflow-x: hidden;
+  }
+
+  :focus-visible {
+    outline: 3px solid #205438;
+    outline-offset: 2px;
+  }
+}
